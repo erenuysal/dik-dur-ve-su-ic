@@ -2,7 +2,7 @@
   "expo": {
     "name": "Dik dur ve su iç",
     "slug": "dik-dur-ve-su-ic",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "scheme": "dikdurvesuic",
@@ -17,7 +17,8 @@
       "bundleIdentifier": "com.seperra.dikdurvesuic",
       "infoPlist": {
         "CFBundleDisplayName": "Dik dur ve su iç",
-        "NSUserNotificationsUsageDescription": "Dik durman ve su içmen için gün içinde nazik hatırlatmalar göndeririz."
+        "NSUserNotificationsUsageDescription": "Dik durman ve su içmen için gün içinde nazik hatırlatmalar göndeririz.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -51,8 +52,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": ""
+        "projectId": "5b0818ca-fd0e-47d1-aae3-03720068aaf2"
       }
-    }
+    },
+    "owner": "seperrasoftware"
   }
 }

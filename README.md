@@ -24,3 +24,14 @@ Fiziksel cihaz veya simülatör gerekir. Expo Go’da yerel bildirimler çalış
 ## Expo
 
 SDK 57. Doküman: https://docs.expo.dev/versions/v57.0.0/
+
+## Mağaza
+
+```bash
+npx eas-cli build --platform ios --profile production --non-interactive
+npx eas-cli build --platform android --profile production --non-interactive
+npx eas-cli submit --platform ios --profile production --latest --non-interactive
+```
+
+Gizlilik: https://erenuysal.github.io/dik-dur-ve-su-ic/gizlilik.html
+Repo: https://github.com/erenuysal/dik-dur-ve-su-ic

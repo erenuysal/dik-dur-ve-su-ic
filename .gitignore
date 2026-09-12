@@ -20,3 +20,5 @@ yarn-error.*
 *.tsbuildinfo
 /ios
 /android
+credentials/*.p8
+credentials/*.json

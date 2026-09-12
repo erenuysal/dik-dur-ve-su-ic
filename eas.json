@@ -1,0 +1,42 @@
+{
+  "cli": {
+    "version": ">= 16.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "android": {
+        "buildType": "app-bundle"
+      },
+      "ios": {
+        "resourceClass": "m-medium"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "appleId": "seperra@hotmail.com",
+        "appleTeamId": "D65G9F43GJ",
+        "ascApiKeyPath": "./credentials/AuthKey_338NB7C99D.p8",
+        "ascApiKeyId": "338NB7C99D",
+        "ascApiKeyIssuerId": "e9e44e96-f8bd-4856-a11c-e620a80e9e75"
+      },
+      "android": {
+        "serviceAccountKeyPath": "./credentials/optikreport-play.json",
+        "track": "internal"
+      }
+    }
+  }
+}
