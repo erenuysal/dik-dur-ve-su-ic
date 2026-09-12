@@ -22,3 +22,8 @@ yarn-error.*
 /android
 credentials/*.p8
 credentials/*.json
+credentials/*.key
+credentials/*.csr
+credentials/*.cer
+credentials/*.txt
+credentials.json

@@ -20,6 +20,7 @@
         "buildType": "app-bundle"
       },
       "ios": {
+        "credentialsSource": "local",
         "resourceClass": "m-medium"
       }
     }
@@ -31,7 +32,10 @@
         "appleTeamId": "D65G9F43GJ",
         "ascApiKeyPath": "./credentials/AuthKey_338NB7C99D.p8",
         "ascApiKeyId": "338NB7C99D",
-        "ascApiKeyIssuerId": "e9e44e96-f8bd-4856-a11c-e620a80e9e75"
+        "ascApiKeyIssuerId": "e9e44e96-f8bd-4856-a11c-e620a80e9e75",
+        "sku": "dik-dur-ve-su-ic",
+        "language": "tr",
+        "companyName": "Seperra Software"
       },
       "android": {
         "serviceAccountKeyPath": "./credentials/optikreport-play.json",
