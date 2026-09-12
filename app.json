@@ -1,0 +1,58 @@
+{
+  "expo": {
+    "name": "Dik dur ve su iç",
+    "slug": "dik-dur-ve-su-ic",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "dikdurvesuic",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.seperra.dikdurvesuic",
+      "infoPlist": {
+        "CFBundleDisplayName": "Dik dur ve su iç",
+        "NSUserNotificationsUsageDescription": "Dik durman ve su içmen için gün içinde nazik hatırlatmalar göndeririz."
+      }
+    },
+    "android": {
+      "package": "com.seperra.dikdurvesuic",
+      "adaptiveIcon": {
+        "backgroundColor": "#1F6B5A",
+        "foregroundImage": "./assets/adaptive-icon.png"
+      },
+      "permissions": [
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.SCHEDULE_EXACT_ALARM",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.VIBRATE"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#1F6B5A",
+          "defaultChannel": "hatirlatmalar"
+        }
+      ],
+      "expo-status-bar"
+    ],
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#F4EFE6"
+    },
+    "extra": {
+      "eas": {
+        "projectId": ""
+      }
+    }
+  }
+}
