@@ -30,6 +30,7 @@
       "ios": {
         "appleId": "seperra@hotmail.com",
         "appleTeamId": "D65G9F43GJ",
+        "ascAppId": "6811658975",
         "ascApiKeyPath": "./credentials/AuthKey_338NB7C99D.p8",
         "ascApiKeyId": "338NB7C99D",
         "ascApiKeyIssuerId": "e9e44e96-f8bd-4856-a11c-e620a80e9e75",

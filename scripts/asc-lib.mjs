@@ -44,6 +44,7 @@ export async function asc(method, urlPath, body) {
       Accept: "application/json",
     },
     body: body ? JSON.stringify(body) : undefined,
+    signal: AbortSignal.timeout(90_000),
   });
   const text = await res.text();
   const json = text ? JSON.parse(text) : null;

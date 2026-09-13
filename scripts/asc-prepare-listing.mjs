@@ -81,23 +81,15 @@ if (trInfo) {
   console.log("appInfoLocalization güncellendi");
 }
 
-const categories = await asc("GET", "/v1/appCategories?filter[platforms]=IOS&limit=50");
-const health = (categories.data || []).find((c) =>
-  /HEALTH_AND_FITNESS|HEALTH/i.test(`${c.id} ${c.attributes?.platforms || ""}`),
-);
-const healthId =
-  (categories.data || []).find((c) => c.id === "HEALTH_AND_FITNESS")?.id || health?.id;
-if (healthId) {
-  await asc("PATCH", `/v1/appInfos/${info.id}`, {
-    data: {
-      type: "appInfos",
-      id: info.id,
-      relationships: {
-        primaryCategory: { data: { type: "appCategories", id: healthId } },
-      },
+await asc("PATCH", `/v1/appInfos/${info.id}`, {
+  data: {
+    type: "appInfos",
+    id: info.id,
+    relationships: {
+      primaryCategory: { data: { type: "appCategories", id: "LIFESTYLE" } },
     },
-  }).catch((e) => console.warn("kategori:", e.message));
-}
+  },
+}).catch((e) => console.warn("kategori:", e.message));
 
 let versions = await asc(
   "GET",
@@ -159,7 +151,10 @@ if (!vLoc) {
 }
 console.log("listing metni tamam");
 
-const ratingRel = await asc("GET", `/v1/appStoreVersions/${version.id}/ageRatingDeclaration`);
+const ratingRel = await asc(
+  "GET",
+  `/v1/appStoreVersions/${version.id}/ageRatingDeclaration`,
+).catch(() => ({ data: null }));
 if (ratingRel.data?.id) {
   await asc("PATCH", `/v1/ageRatingDeclarations/${ratingRel.data.id}`, {
     data: {
