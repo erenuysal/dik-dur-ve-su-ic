@@ -14,7 +14,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import * as Notifications from "expo-notifications";
 import { INTERVAL_OPTIONS } from "../constants";
-import { isConfirmAction, prepareNotifications } from "../lib/notifications";
+import {
+  getNotificationGranted,
+  isConfirmAction,
+  requestNotificationPermission,
+  setupNotificationChrome,
+} from "../lib/notifications";
 import {
   confirmReminder,
   disableReminders,
@@ -22,6 +27,7 @@ import {
   markDelivered,
   scheduleTestReminder,
   statusCopy,
+  syncInAppDelivery,
 } from "../lib/scheduler";
 import { loadSettings, saveSettings } from "../lib/storage";
 import { colors, space } from "../theme";
@@ -39,12 +45,16 @@ async function applyConfirm() {
 export function HomeScreen() {
   const [settings, setSettings] = useState<AppSettings | null>(null);
   const [busy, setBusy] = useState(false);
+  const [pushOn, setPushOn] = useState(false);
 
   const refresh = useCallback(async () => {
-    setSettings(await loadSettings());
+    const current = await loadSettings();
+    setSettings(await syncInAppDelivery(current));
+    setPushOn(await getNotificationGranted());
   }, []);
 
   useEffect(() => {
+    void setupNotificationChrome();
     void refresh();
     const last = Notifications.getLastNotificationResponse();
     if (last && isConfirmAction(last.actionIdentifier)) {
@@ -79,10 +89,14 @@ export function HomeScreen() {
         void refresh();
       }
     });
+    const tick = setInterval(() => {
+      void refresh();
+    }, 4000);
     return () => {
       received.remove();
       response.remove();
       appState.remove();
+      clearInterval(tick);
     };
   }, [refresh]);
 
@@ -109,13 +123,34 @@ export function HomeScreen() {
       await withBusy(() => disableReminders(settings));
       return;
     }
-    const allowed = await prepareNotifications();
-    if (!allowed) {
-      Alert.alert("Bildirim kapalı", "Ayarlardan bildirim iznini açman gerekiyor.");
+    const alreadyGranted = await getNotificationGranted();
+    if (alreadyGranted) {
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      await withBusy(() => enableReminders(settings, settings.intervalMinutes));
       return;
     }
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    await withBusy(() => enableReminders(settings, settings.intervalMinutes));
+    Alert.alert(
+      "Bildirimler isteğe bağlı",
+      "Hatırlatmalar uygulama içinde çalışır. İstersen kilit ekranı bildirimi de açabilirsin; vermezsen uygulama yine kullanılır.",
+      [
+        {
+          text: "Uygulama içinde hatırlat",
+          onPress: () => {
+            void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            void withBusy(() => enableReminders(settings, settings.intervalMinutes));
+          },
+        },
+        {
+          text: "Bildirim izni ver",
+          onPress: () => {
+            void requestNotificationPermission().then(() => {
+              void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              void withBusy(() => enableReminders(settings, settings.intervalMinutes));
+            });
+          },
+        },
+      ],
+    );
   }
 
   async function changeInterval(minutes: IntervalMinutes) {
@@ -140,11 +175,6 @@ export function HomeScreen() {
 
   async function sendTest() {
     if (!settings) {
-      return;
-    }
-    const allowed = await prepareNotifications();
-    if (!allowed) {
-      Alert.alert("Bildirim kapalı", "Ayarlardan bildirim iznini açman gerekiyor.");
       return;
     }
     await withBusy(() => scheduleTestReminder(settings));
@@ -204,7 +234,9 @@ export function HomeScreen() {
         <View style={styles.toggleRow}>
           <View>
             <Text style={styles.toggleTitle}>Hatırlatmalar</Text>
-            <Text style={styles.toggleHint}>Onaylanmayan bildirim durur. 3 saat sonra bir kez daha sorar.</Text>
+            <Text style={styles.toggleHint}>
+              İsteğe bağlı. İzin vermezsen hatırlatma uygulama içinde kalır. Onaylanmayan durur; 3 saat sonra bir kez daha sorar.
+            </Text>
           </View>
           <Switch
             value={settings.enabled}
@@ -214,7 +246,14 @@ export function HomeScreen() {
           />
         </View>
 
-        <Text style={styles.today}>Bugün {settings.confirmedToday} kez onayladın</Text>
+        <Text style={styles.today}>
+          Bugün {settings.confirmedToday} kez onayladın
+          {settings.enabled
+            ? pushOn
+              ? " · kilit ekranı bildirimi açık"
+              : " · bildirim kapalı, uygulama içinde hatırlatıyor"
+            : ""}
+        </Text>
 
         <Pressable style={styles.ghost} onPress={() => void sendTest()}>
           <Text style={styles.ghostLabel}>5 saniye sonra dene</Text>

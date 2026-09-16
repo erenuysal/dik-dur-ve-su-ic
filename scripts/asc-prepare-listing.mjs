@@ -12,7 +12,7 @@ const APP_ID = readAppId();
 const PRIVACY = "https://erenuysal.github.io/dik-dur-ve-su-ic/gizlilik.html";
 const DESCRIPTION = `Dik dur ve su iç, gün içinde omuzlarını ve suyu unutmaman için nazik hatırlatmalar gönderir.
 
-Seçtiğin aralıkla (30 dakika–3 saat) bildirim gelir. Uygulama yalnızca sabah 11:00 ile akşam 21:00 arasında çalışır.
+Seçtiğin aralıkla (30 dakika–3 saat) hatırlatma gelir. Bildirim izni isteğe bağlıdır; vermezsen hatırlatma uygulama içinde durur. Uygulama yalnızca sabah 11:00 ile akşam 21:00 arasında çalışır.
 
 Bir bildirimi görüp onaylamazsan yenisi gelmez; bildirim durur. 3 saat tıklamazsan tek bir nazik tekrar gider.
 
@@ -106,7 +106,7 @@ if (!version) {
       type: "appStoreVersions",
       attributes: {
         platform: "IOS",
-        versionString: "1.0.0",
+        versionString: "1.0.1",
         copyright: "2026 Seperra Software",
       },
       relationships: { app: { data: { type: "apps", id: APP_ID } } },
@@ -191,7 +191,7 @@ const reviewAttrs = {
   contactPhone: "+905533821355",
   demoAccountRequired: false,
   notes:
-    "Hesap yok. Uygulamayı açın, hatırlatmaları açın, aralık seçin. İsteğe bağlı: 5 saniye sonra dene. Bildirimde İçtim veya Dik durdum ile onaylanır. Tıbbi iddia yok; yalnızca hatırlatma.",
+    "Hesap yok. Guideline 4.5.4: bildirim izni zorunlu değil. Uygulamayı açın, aralık seçin, Hatırlatmalar anahtarını açın. Sistem izni sormadan önce iki seçenek çıkar: Uygulama içinde hatırlat / Bildirim izni ver. İzni reddedin; hatırlatma uygulama kartında durur, Yaptım ile onaylanır. İsteğe bağlı: 5 saniye sonra dene. Tıbbi iddia yok.",
 };
 if (review.data?.id) {
   await asc("PATCH", `/v1/appStoreReviewDetails/${review.data.id}`, {

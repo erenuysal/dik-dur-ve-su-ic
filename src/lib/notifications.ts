@@ -19,11 +19,11 @@ Notifications.setNotificationHandler({
   }),
 });
 
-export async function prepareNotifications(): Promise<boolean> {
+export async function setupNotificationChrome(): Promise<void> {
   if (Platform.OS === "android") {
     await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
       name: "Dik dur ve su iç",
-      description: "11:00–21:00 arası duruş ve su hatırlatmaları",
+      description: "İsteğe bağlı duruş ve su hatırlatmaları (11:00–21:00)",
       importance: Notifications.AndroidImportance.HIGH,
       vibrationPattern: [0, 180, 120, 180],
       lightColor: "#1F6B5A",
@@ -53,20 +53,36 @@ export async function prepareNotifications(): Promise<boolean> {
       showSubtitle: true,
     },
   );
+}
 
+export async function getNotificationGranted(): Promise<boolean> {
   const existing = await Notifications.getPermissionsAsync();
-  let status = existing.status;
-  if (status !== "granted") {
-    const asked = await Notifications.requestPermissionsAsync({
-      ios: {
-        allowAlert: true,
-        allowBadge: false,
-        allowSound: true,
-      },
-    });
-    status = asked.status;
+  return existing.status === "granted";
+}
+
+/** Only call after the user explicitly chooses system notifications. */
+export async function requestNotificationPermission(): Promise<boolean> {
+  await setupNotificationChrome();
+  const existing = await Notifications.getPermissionsAsync();
+  if (existing.status === "granted") {
+    return true;
   }
-  return status === "granted";
+  if (existing.status === "denied" && !existing.canAskAgain) {
+    return false;
+  }
+  const asked = await Notifications.requestPermissionsAsync({
+    ios: {
+      allowAlert: true,
+      allowBadge: false,
+      allowSound: true,
+    },
+  });
+  return asked.status === "granted";
+}
+
+/** @deprecated Use getNotificationGranted / requestNotificationPermission. */
+export async function prepareNotifications(): Promise<boolean> {
+  return getNotificationGranted();
 }
 
 export function isConfirmAction(actionIdentifier: string): boolean {

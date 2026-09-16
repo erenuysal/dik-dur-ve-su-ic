@@ -1,8 +1,10 @@
 import { NUDGE_ID, REMINDER_ID, TEST_ID } from "../constants";
 import type { AppSettings, IntervalMinutes, PendingReminder, ReminderKind } from "../types";
+import { pickCopy } from "./messages";
 import {
   cancelAllReminders,
   dismissPresented,
+  getNotificationGranted,
   scheduleLocalReminder,
 } from "./notifications";
 import { saveSettings } from "./storage";
@@ -72,22 +74,38 @@ export async function markDelivered(
 
 export async function scheduleTestReminder(settings: AppSettings): Promise<AppSettings> {
   const when = new Date(Date.now() + 5000);
-  const scheduled = await scheduleLocalReminder({
-    id: TEST_ID,
-    when,
-    kind: "test",
-  });
+  const copy = pickCopy("test", when.getTime());
+  if (await getNotificationGranted()) {
+    await scheduleLocalReminder({
+      id: TEST_ID,
+      when,
+      kind: "test",
+    });
+  }
   return saveSettings({
     ...settings,
     pending: {
       kind: "test",
-      title: scheduled.title,
-      body: scheduled.body,
+      title: copy.title,
+      body: copy.body,
       scheduledAt: when.toISOString(),
       reminderId: TEST_ID,
       nudgeId: NUDGE_ID,
     },
   });
+}
+
+export async function syncInAppDelivery(
+  settings: AppSettings,
+  now = new Date(),
+): Promise<AppSettings> {
+  if (!settings.enabled || !settings.pending || settings.pending.deliveredAt) {
+    return settings;
+  }
+  if (new Date(settings.pending.scheduledAt) > now) {
+    return settings;
+  }
+  return markDelivered(settings, settings.pending.kind, undefined, now);
 }
 
 export function statusCopy(settings: AppSettings, now = new Date()): {
@@ -99,7 +117,8 @@ export function statusCopy(settings: AppSettings, now = new Date()): {
     return {
       eyebrow: "Kapalı",
       title: "Hatırlatma yok",
-      detail: "Açınca yalnızca 11:00–21:00 arasında, seçtiğin aralıkla gelir.",
+      detail:
+        "Hatırlatmalar isteğe bağlı. Açınca 11:00–21:00 arasında, seçtiğin aralıkla uygulama içinde gelir. Bildirim izni vermen gerekmez.",
     };
   }
   if (settings.pending?.deliveredAt) {
@@ -113,7 +132,8 @@ export function statusCopy(settings: AppSettings, now = new Date()): {
     return {
       eyebrow: "Sıradaki",
       title: formatDayClock(new Date(settings.pending.scheduledAt), now),
-      detail: "Onaylamadan yeni bir bildirim gelmez. 3 saat tıklanmazsa nazikçe tekrar ederim.",
+      detail:
+        "Onaylamadan yenisi gelmez. Bildirim izni yoksa hatırlatma uygulama açıkken burada durur. 3 saat tıklanmazsa bir kez daha sorar.",
     };
   }
   return {
@@ -124,23 +144,25 @@ export function statusCopy(settings: AppSettings, now = new Date()): {
 }
 
 async function planPair(kind: ReminderKind, when: Date): Promise<PendingReminder> {
-  const reminder = await scheduleLocalReminder({
-    id: REMINDER_ID,
-    when,
-    kind,
-  });
-  const nudgeWhen = nudgeAt(when);
-  const nudge = await scheduleLocalReminder({
-    id: NUDGE_ID,
-    when: nudgeWhen,
-    kind: "nudge",
-  });
+  const copy = pickCopy(kind, when.getTime());
+  if (await getNotificationGranted()) {
+    await scheduleLocalReminder({
+      id: REMINDER_ID,
+      when,
+      kind,
+    });
+    await scheduleLocalReminder({
+      id: NUDGE_ID,
+      when: nudgeAt(when),
+      kind: "nudge",
+    });
+  }
   return {
     kind,
-    title: reminder.title,
-    body: reminder.body,
+    title: copy.title,
+    body: copy.body,
     scheduledAt: when.toISOString(),
-    reminderId: reminder.id,
-    nudgeId: nudge.id,
+    reminderId: REMINDER_ID,
+    nudgeId: NUDGE_ID,
   };
 }

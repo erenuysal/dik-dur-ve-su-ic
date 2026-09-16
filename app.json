@@ -2,7 +2,7 @@
   "expo": {
     "name": "Dik dur ve su iç",
     "slug": "dik-dur-ve-su-ic",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "scheme": "dikdurvesuic",
@@ -13,11 +13,11 @@
       "android"
     ],
     "ios": {
-      "supportsTablet": false,
+      "supportsTablet": true,
       "bundleIdentifier": "com.seperra.dikdurvesuic",
       "infoPlist": {
         "CFBundleDisplayName": "Dik dur ve su iç",
-        "NSUserNotificationsUsageDescription": "Dik durman ve su içmen için gün içinde nazik hatırlatmalar göndeririz.",
+        "NSUserNotificationsUsageDescription": "Bildirimler isteğe bağlıdır. İzin verirsen dik durman ve su içmen için gün içinde nazik hatırlatmalar göndeririz. İzin vermezsen hatırlatmalar uygulama içinde çalışır.",
         "ITSAppUsesNonExemptEncryption": false
       }
     },
